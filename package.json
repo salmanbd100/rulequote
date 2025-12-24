@@ -2,7 +2,12 @@
   "name": "@rulequote/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md,html,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md,html,yml,yaml}\"",
+    "lint": "nx run-many --target=lint --all",
+    "lint:fix": "nx run-many --target=lint --all --fix"
+  },
   "private": true,
   "devDependencies": {
     "@eslint/js": "^9.8.0",

@@ -1,5 +1,36 @@
-# Add files here to ignore them from prettier formatting
-/dist
-/coverage
-/.nx/cache
-/.nx/workspace-data
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+out
+out-tsc
+.next
+.nuxt
+.cache
+
+# Coverage
+coverage
+.nyc_output
+
+# Nx
+.nx/cache
+.nx/workspace-data
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+*.min.js
+*.min.css
+
+# Logs
+*.log
+error.log
+
+# OS
+.DS_Store
+Thumbs.db
