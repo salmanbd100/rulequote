@@ -18,7 +18,9 @@ This is an **Nx workspace** monorepo with the following configuration:
 
 ### Current Projects
 
-- **`web`** - React application (located in `/web` directory)
+- **`web`** - React application (Vite, port 4200)
+- **`api`** - Express/Node.js API server (Webpack, port 3333)
+- **`pdf-service`** - Express/Node.js PDF service (Webpack, port 3334)
 
 ## 🚀 Quick Start
 
@@ -32,22 +34,103 @@ This is an **Nx workspace** monorepo with the following configuration:
 ```bash
 # Install all dependencies
 pnpm install
+
+# Install dotenv for environment variable support
+pnpm install
 ```
+
+### Environment Setup
+
+This workspace uses environment variables to configure port numbers and other settings for each application.
+
+#### Setup Instructions
+
+After cloning the repository, create `.env` files in each application directory:
+
+**Option 1: Use the setup script**
+
+```bash
+# Run the setup script (creates .env files from templates)
+./setup-env.sh
+```
+
+**Option 2: Manually create .env files**
+
+**Web Application:**
+
+```bash
+cp web/.env.example web/.env
+```
+
+**API Application:**
+
+```bash
+cp api/.env.example api/.env
+```
+
+**PDF Service Application:**
+
+```bash
+cp pdf-service/.env.example pdf-service/.env
+```
+
+#### Default Ports
+
+- **Web**: `4200` (configurable via `PORT` in `web/.env`)
+- **API**: `3333` (configurable via `PORT` in `api/.env`)
+- **PDF Service**: `3334` (configurable via `PORT` in `pdf-service/.env`)
+
+#### Environment Variables
+
+**Web (`web/.env`):**
+
+```
+PORT=4200
+HOST=localhost
+```
+
+**API (`api/.env`):**
+
+```
+PORT=3333
+NODE_ENV=development
+```
+
+**PDF Service (`pdf-service/.env`):**
+
+```
+PORT=3334
+NODE_ENV=development
+```
+
+#### Notes
+
+- `.env` files are gitignored and should not be committed
+- `.env.example` files serve as templates and should be committed
+- You can override these values by setting environment variables in your shell or CI/CD pipeline
 
 ### Development
 
 ```bash
-# Start the development server for the web app
+# Start the web app (React)
 npx nx dev web
-# or
-npx nx serve web
-```
+# Available at http://localhost:4200
 
-The app will be available at `http://localhost:4200`
+# Start the API server
+npx nx serve api
+# Available at http://localhost:3333/api
+
+# Start the PDF service
+npx nx serve pdf-service
+# Available at http://localhost:3334/api
+
+# Run all apps simultaneously
+npx nx run-many -t serve --projects=web,api,pdf-service --parallel=3
+```
 
 ## 📚 Available Commands
 
-### For the `web` Project
+### For the `web` Project (React App)
 
 #### Development
 
@@ -97,6 +180,70 @@ npx nx lint web --fix
 
 # Type check without building
 npx nx typecheck web
+```
+
+### For the `api` Project (Express API)
+
+#### Development
+
+```bash
+# Start API server with watch mode
+npx nx serve api
+
+# Start with development configuration
+npx nx serve api --configuration=development
+
+# Start with production configuration
+npx nx serve api --configuration=production
+```
+
+#### Building
+
+```bash
+# Build for production
+npx nx build api
+```
+
+#### Code Quality
+
+```bash
+# Lint code
+npx nx lint api
+
+# Fix linting issues automatically
+npx nx lint api --fix
+```
+
+### For the `pdf-service` Project (PDF Service)
+
+#### Development
+
+```bash
+# Start PDF service with watch mode
+npx nx serve pdf-service
+
+# Start with development configuration
+npx nx serve pdf-service --configuration=development
+
+# Start with production configuration
+npx nx serve pdf-service --configuration=production
+```
+
+#### Building
+
+```bash
+# Build for production
+npx nx build pdf-service
+```
+
+#### Code Quality
+
+```bash
+# Lint code
+npx nx lint pdf-service
+
+# Fix linting issues automatically
+npx nx lint pdf-service --fix
 ```
 
 ### Run Tasks Across All Projects
@@ -152,15 +299,27 @@ The `web` project has the following targets (automatically inferred by Nx plugin
 
 ```
 rulequote/
-├── web/                 # React application
+├── web/                 # React application (Vite)
 │   ├── src/            # Source code
 │   ├── public/         # Static assets
+│   ├── .env            # Environment variables (gitignored)
 │   ├── project.json    # Project configuration
 │   └── vite.config.mts # Vite configuration
+├── api/                 # Express API server (Webpack)
+│   ├── src/            # Source code
+│   ├── .env            # Environment variables (gitignored)
+│   ├── project.json    # Project configuration
+│   └── webpack.config.js # Webpack configuration
+├── pdf-service/         # PDF service (Webpack)
+│   ├── src/            # Source code
+│   ├── .env            # Environment variables (gitignored)
+│   ├── project.json    # Project configuration
+│   └── webpack.config.js # Webpack configuration
 ├── nx.json             # Nx workspace configuration
 ├── package.json        # Root dependencies
 ├── pnpm-workspace.yaml # pnpm workspace config
-└── tsconfig.base.json  # Shared TypeScript config
+├── tsconfig.base.json  # Shared TypeScript config
+└── setup-env.sh        # Environment setup script
 ```
 
 ## ⚙️ Configuration Details
@@ -170,6 +329,7 @@ rulequote/
 - **Plugins**:
   - `@nx/eslint/plugin` - Auto-creates lint targets
   - `@nx/vite/plugin` - Auto-creates Vite targets (build, serve, test, etc.)
+  - `@nx/webpack/plugin` - Auto-creates Webpack targets (build, serve, etc.)
 - **Named Inputs**: Defines cache invalidation rules for optimized builds
 - **Generators**: Default options for React apps (CSS styling, ESLint, Vite bundler)
 
@@ -185,9 +345,18 @@ rulequote/
 
 ### Vite Configuration (`web/vite.config.mts`)
 
-- Development server: `localhost:4200`
+- Development server: Configurable via `PORT` env variable (default: `4200`)
+- Host: Configurable via `HOST` env variable (default: `localhost`)
 - Build output: `dist/web`
 - Configured with React plugin and Nx TypeScript path support
+- Reads environment variables from `web/.env`
+
+### Webpack Configuration (`api/webpack.config.js` & `pdf-service/webpack.config.js`)
+
+- Node.js target applications
+- Build output: `dist/api` and `dist/pdf-service`
+- Configured with Nx Webpack plugin
+- Reads environment variables via `dotenv` package
 
 ## ➕ Adding New Projects
 
@@ -230,6 +399,8 @@ npx nx list @nx/react
 - **Parallel Execution**: Run multiple tasks in parallel for better performance
 - **Affected Detection**: Only run tasks for projects that have changed
 - **TypeScript Path Mapping**: Ready for path aliases configuration
+- **Environment Variables**: All apps use `.env` files for configuration (ports, etc.)
+- **Port Management**: Each app has its own configurable port to avoid conflicts
 
 ## 🔗 Remote Caching Setup
 
