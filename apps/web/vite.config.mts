@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     root: import.meta.dirname,
-    cacheDir: '../node_modules/.vite/web',
+    cacheDir: '../../node_modules/.vite/web',
     server: {
       port,
       host,
@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
     //   plugins: () => [ nxViteTsPaths() ],
     // },
     build: {
-      outDir: '../dist/web',
+      outDir: '../../dist/web',
       emptyOutDir: true,
       reportCompressedSize: true,
       commonjsOptions: {

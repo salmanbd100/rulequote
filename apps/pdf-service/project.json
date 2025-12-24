@@ -1,7 +1,7 @@
 {
   "name": "pdf-service",
-  "$schema": "../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "pdf-service/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/pdf-service/src",
   "projectType": "application",
   "tags": [],
   "targets": {

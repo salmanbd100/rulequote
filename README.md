@@ -59,44 +59,44 @@ After cloning the repository, create `.env` files in each application directory:
 **Web Application:**
 
 ```bash
-cp web/.env.example web/.env
+cp apps/web/.env.example apps/web/.env
 ```
 
 **API Application:**
 
 ```bash
-cp api/.env.example api/.env
+cp apps/api/.env.example apps/api/.env
 ```
 
 **PDF Service Application:**
 
 ```bash
-cp pdf-service/.env.example pdf-service/.env
+cp apps/pdf-service/.env.example apps/pdf-service/.env
 ```
 
 #### Default Ports
 
-- **Web**: `4200` (configurable via `PORT` in `web/.env`)
-- **API**: `3333` (configurable via `PORT` in `api/.env`)
-- **PDF Service**: `3334` (configurable via `PORT` in `pdf-service/.env`)
+- **Web**: `4200` (configurable via `PORT` in `apps/web/.env`)
+- **API**: `3333` (configurable via `PORT` in `apps/api/.env`)
+- **PDF Service**: `3334` (configurable via `PORT` in `apps/pdf-service/.env`)
 
 #### Environment Variables
 
-**Web (`web/.env`):**
+**Web (`apps/web/.env`):**
 
 ```
 PORT=4200
 HOST=localhost
 ```
 
-**API (`api/.env`):**
+**API (`apps/api/.env`):**
 
 ```
 PORT=3333
 NODE_ENV=development
 ```
 
-**PDF Service (`pdf-service/.env`):**
+**PDF Service (`apps/pdf-service/.env`):**
 
 ```
 PORT=3334
@@ -299,22 +299,23 @@ The `web` project has the following targets (automatically inferred by Nx plugin
 
 ```
 rulequote/
-├── web/                 # React application (Vite)
-│   ├── src/            # Source code
-│   ├── public/         # Static assets
-│   ├── .env            # Environment variables (gitignored)
-│   ├── project.json    # Project configuration
-│   └── vite.config.mts # Vite configuration
-├── api/                 # Express API server (Webpack)
-│   ├── src/            # Source code
-│   ├── .env            # Environment variables (gitignored)
-│   ├── project.json    # Project configuration
-│   └── webpack.config.js # Webpack configuration
-├── pdf-service/         # PDF service (Webpack)
-│   ├── src/            # Source code
-│   ├── .env            # Environment variables (gitignored)
-│   ├── project.json    # Project configuration
-│   └── webpack.config.js # Webpack configuration
+├── apps/               # Applications directory
+│   ├── web/            # React application (Vite)
+│   │   ├── src/        # Source code
+│   │   ├── public/     # Static assets
+│   │   ├── .env        # Environment variables (gitignored)
+│   │   ├── project.json # Project configuration
+│   │   └── vite.config.mts # Vite configuration
+│   ├── api/            # Express API server (Webpack)
+│   │   ├── src/        # Source code
+│   │   ├── .env        # Environment variables (gitignored)
+│   │   ├── project.json # Project configuration
+│   │   └── webpack.config.js # Webpack configuration
+│   └── pdf-service/    # PDF service (Webpack)
+│       ├── src/        # Source code
+│       ├── .env        # Environment variables (gitignored)
+│       ├── project.json # Project configuration
+│       └── webpack.config.js # Webpack configuration
 ├── nx.json             # Nx workspace configuration
 ├── package.json        # Root dependencies
 ├── pnpm-workspace.yaml # pnpm workspace config
@@ -343,15 +344,15 @@ rulequote/
 - Shared TypeScript configuration for all projects
 - Path aliases can be configured here for project imports
 
-### Vite Configuration (`web/vite.config.mts`)
+### Vite Configuration (`apps/web/vite.config.mts`)
 
 - Development server: Configurable via `PORT` env variable (default: `4200`)
 - Host: Configurable via `HOST` env variable (default: `localhost`)
 - Build output: `dist/web`
 - Configured with React plugin and Nx TypeScript path support
-- Reads environment variables from `web/.env`
+- Reads environment variables from `apps/web/.env`
 
-### Webpack Configuration (`api/webpack.config.js` & `pdf-service/webpack.config.js`)
+### Webpack Configuration (`apps/api/webpack.config.js` & `apps/pdf-service/webpack.config.js`)
 
 - Node.js target applications
 - Build output: `dist/api` and `dist/pdf-service`
