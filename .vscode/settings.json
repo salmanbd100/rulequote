@@ -1,0 +1,103 @@
+{
+  // ----------------------------
+  // Editor: formatting & consistency
+  // ----------------------------
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ✅ Great for monorepos: consistent lint & imports across packages
+  // "explicit" = runs when appropriate, "always" = always runs on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always"
+  },
+
+  "editor.rulers": [100],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+
+  // ----------------------------
+  // Prettier: controlled formatting
+  // ----------------------------
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": false,
+
+  // ----------------------------
+  // ESLint: Nx + flat config optimized
+  // ----------------------------
+  "eslint.enable": true,
+  "eslint.useFlatConfig": true,
+
+  // ✅ Critical in Nx: ensures ESLint uses correct root per app/lib
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+
+  // ✅ Show eslint status in VS Code
+  "eslint.alwaysShowStatus": true,
+
+  // ----------------------------
+  // TypeScript: Nx monorepo performance
+  // ----------------------------
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.importModuleSpecifier": "relative",
+
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+
+  "typescript.suggest.autoImports": true,
+  "javascript.suggest.autoImports": true,
+
+  // ✅ Helps big Nx workspaces
+  "typescript.tsserver.maxTsServerMemory": 4096,
+
+  // ----------------------------
+  // Exclusions: speed up search, file watch, explorer
+  // ----------------------------
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.nx": true,
+    "**/coverage": true
+  },
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.nx": true,
+    "**/coverage": true,
+    "**/pnpm-lock.yaml": true,
+    "**/package-lock.json": true,
+    "**/yarn.lock": true
+  },
+
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.nx/**": true,
+    "**/coverage/**": true
+  },
+
+  // ----------------------------
+  // Nx + Explorer UI
+  // ----------------------------
+  "nx.enableLibraryImports": true,
+  "explorer.compactFolders": false,
+  "workbench.tree.indent": 16
+}
