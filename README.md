@@ -87,6 +87,7 @@ cp apps/pdf-service/.env.example apps/pdf-service/.env
 ```
 PORT=4200
 HOST=localhost
+VITE_API_URL=http://localhost:3333/api
 ```
 
 **API (`apps/api/.env`):**
@@ -108,6 +109,7 @@ NODE_ENV=development
 - `.env` files are gitignored and should not be committed
 - `.env.example` files serve as templates and should be committed
 - You can override these values by setting environment variables in your shell or CI/CD pipeline
+- **Important**: For Vite (web app), environment variables must be prefixed with `VITE_` to be exposed to the client (e.g., `VITE_API_URL`)
 
 ### Development
 

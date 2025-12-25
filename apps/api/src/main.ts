@@ -2,14 +2,14 @@
  * Express API server bootstrap
  */
 
+import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
 import * as path from 'path';
-import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error-handler';
-import quotesRouter from './routes/quotes';
+import { logger } from './middleware/logger';
 import pdfJobsRouter from './routes/pdf-jobs';
+import quotesRouter from './routes/quotes';
 
 const app = express();
 
@@ -21,6 +21,19 @@ app.use(logger);
 
 // Static assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Rulequote API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      quotes: '/api/quotes',
+      pdfJobs: '/api/pdf-jobs',
+    },
+  });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
