@@ -112,6 +112,15 @@ NODE_ENV=development
 ### Development
 
 ```bash
+# Start all apps simultaneously (recommended)
+pnpm dev
+# This will start:
+# - Web app at http://localhost:4200
+# - API server at http://localhost:3333/api
+# - PDF service at http://localhost:3334/api
+
+# Or start individual apps:
+
 # Start the web app (React)
 npx nx dev web
 # Available at http://localhost:4200
@@ -124,7 +133,7 @@ npx nx serve api
 npx nx serve pdf-service
 # Available at http://localhost:3334/api
 
-# Run all apps simultaneously
+# Run all apps simultaneously (alternative)
 npx nx run-many -t serve --projects=web,api,pdf-service --parallel=3
 ```
 

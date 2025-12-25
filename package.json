@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "dev": "nx run-many -t serve --projects=web,api,pdf-service --parallel=3",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md,html,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md,html,yml,yaml}\"",
     "lint": "nx run-many --target=lint --all",
