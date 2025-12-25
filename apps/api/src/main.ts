@@ -1,22 +1,46 @@
 /**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
+ * Express API server bootstrap
  */
 
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import * as path from 'path';
+import { logger } from './middleware/logger';
+import { errorHandler } from './middleware/error-handler';
+import quotesRouter from './routes/quotes';
+import pdfJobsRouter from './routes/pdf-jobs';
 
 const app = express();
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(logger);
+
+// Static assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to api!' });
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Routes
+app.use('/api/quotes', quotesRouter);
+app.use('/api/pdf-jobs', pdfJobsRouter);
+
+// Root endpoint
+app.get('/api', (req, res) => {
+  res.json({ message: 'Welcome to Rulequote API!' });
+});
+
+// Error handling (must be last)
+app.use(errorHandler);
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
+  console.log(`🚀 API server listening at http://localhost:${port}/api`);
 });
 server.on('error', console.error);
