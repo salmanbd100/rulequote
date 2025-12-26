@@ -1,447 +1,383 @@
-# Rulequote
+# RuleQuote
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A rules-based quote builder with async PDF export, built as an Nx monorepo.
 
-An Nx monorepo workspace powered by React, Vite, and TypeScript.
+## 🎯 Project Overview
 
-## 📋 Monorepo Overview
+RuleQuote is a full-stack application that demonstrates:
+- **Nx Monorepo** architecture with apps and libraries
+- **React** with Chakra UI for modern, responsive UI
+- **React Query** for efficient data fetching and caching
+- **Zod + React Hook Form** for type-safe form validation
+- **Node/Express** services with Prisma ORM
+- **Rules engine** for config-driven business logic
+- **Async job pattern** for PDF generation with real-time status tracking
 
-This is an **Nx workspace** monorepo with the following configuration:
+## 📋 Features
 
-- **Nx Version**: 22.3.3
-- **Package Manager**: pnpm
-- **Build Tool**: Vite 7.0
-- **Framework**: React 19
-- **Language**: TypeScript 5.9
-- **Testing**: Vitest 4.0
-- **Linting**: ESLint 9.8
+- ✅ Create quotes with customer information and line items
+- ✅ Rules-based totals calculation (discounts, taxes by customer type)
+- ✅ Save quotes to PostgreSQL database
+- ✅ Generate PDFs asynchronously with job status tracking
+- ✅ View and download generated PDFs
+- ✅ Delete quotes with confirmation
+- ✅ Real-time PDF job status polling
 
-### Current Projects
+## 🏗️ Architecture
 
-- **`web`** - React application (Vite, port 4200)
-- **`api`** - Express/Node.js API server (Webpack, port 3333)
-- **`pdf-service`** - Express/Node.js PDF service (Webpack, port 3334)
+### Monorepo Structure
+
+```
+rulequote/
+├── apps/
+│   ├── web/              # React frontend (Chakra UI + React Query)
+│   ├── api/              # Express API (CRUD + rules evaluation)
+│   └── pdf-service/      # Express worker (HTML→PDF generation)
+├── libs/
+│   ├── ui/               # Reusable Chakra UI components
+│   ├── schemas/          # Zod schemas (shared FE/BE)
+│   ├── data-access/      # API client + React Query hooks
+│   ├── rules/            # Rules engine (calculateTotals)
+│   └── utils/            # Utility functions
+└── prisma/               # Prisma schema and migrations
+```
+
+### Technology Stack
+
+**Frontend:**
+- React 19 + TypeScript
+- Chakra UI v3 for components
+- React Query (TanStack Query) for data fetching
+- React Hook Form + Zod for forms
+- React Router for navigation
+
+**Backend:**
+- Node.js + Express
+- Prisma ORM with PostgreSQL
+- Zod for validation
+- Axios for HTTP requests
+
+**Infrastructure:**
+- Nx monorepo
+- pnpm workspaces
+- TypeScript path aliases
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v20 or higher recommended)
-- pnpm installed globally: `npm install -g pnpm`
+- Node.js 20+
+- pnpm (`npm install -g pnpm`)
+- PostgreSQL database
 
 ### Installation
 
 ```bash
-# Install all dependencies
+# Install dependencies
 pnpm install
 
-# Install dotenv for environment variable support
-pnpm install
+# Set up environment variables
+cp .env.example .env
+# Edit .env and set DATABASE_URL
+
+# Set up database
+pnpm prisma generate
+pnpm prisma migrate dev
+
+# Start all services
+pnpm dev
 ```
 
-### Environment Setup
+This starts:
+- **Web app**: http://localhost:4200
+- **API server**: http://localhost:3333/api
+- **PDF service**: http://localhost:3334/api
 
-This workspace uses environment variables to configure port numbers and other settings for each application.
+### Environment Variables
 
-#### Setup Instructions
+Create a `.env` file in the root:
 
-After cloning the repository, create `.env` files in each application directory:
-
-**Option 1: Use the setup script**
-
-```bash
-# Run the setup script (creates .env files from templates)
-./setup-env.sh
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/rulequote"
+PORT=3333
+PDF_SERVICE_URL=http://localhost:3334/api
+API_URL=http://localhost:3333/api
 ```
 
-**Option 2: Manually create .env files**
+For the web app, create `apps/web/.env`:
 
-**Web Application:**
-
-```bash
-cp apps/web/.env.example apps/web/.env
-```
-
-**API Application:**
-
-```bash
-cp apps/api/.env.example apps/api/.env
-```
-
-**PDF Service Application:**
-
-```bash
-cp apps/pdf-service/.env.example apps/pdf-service/.env
-```
-
-#### Default Ports
-
-- **Web**: `4200` (configurable via `PORT` in `apps/web/.env`)
-- **API**: `3333` (configurable via `PORT` in `apps/api/.env`)
-- **PDF Service**: `3334` (configurable via `PORT` in `apps/pdf-service/.env`)
-
-#### Environment Variables
-
-**Web (`apps/web/.env`):**
-
-```
-PORT=4200
-HOST=localhost
+```env
 VITE_API_URL=http://localhost:3333/api
 ```
 
-**API (`apps/api/.env`):**
+## 📁 Folder Structure
+
+### Apps
+
+#### `apps/web` - React Frontend
+- **Pages**: QuotesListPage, CreateQuotePage, QuoteDetailPage
+- **Components**: App layout with Chakra UI
+- **Routing**: React Router with nested routes
+
+#### `apps/api` - Express API
+- **Routes**: `/api/quotes`, `/api/pdf-jobs`
+- **Middleware**: Logger, error handler
+- **Database**: Prisma client integration
+
+#### `apps/pdf-service` - PDF Worker
+- **Jobs**: `process-pdf-job.ts` - HTML to PDF conversion
+- **Templates**: `quote-html.ts` - HTML template generator
+
+### Libraries
+
+#### `libs/ui` - UI Components
+- `AppButton` - Styled button with variants
+- `FormField` - Form input with label and error handling
+- `ConfirmModal` - Confirmation dialog
+
+#### `libs/schemas` - Zod Schemas
+- `createQuoteSchema` - Quote creation validation
+- `pdfJobSchema` - PDF job status schema
+
+#### `libs/data-access` - API Integration
+- `apiClient` - Axios instance with interceptors
+- `useQuotes` - Fetch all quotes
+- `useQuote` - Fetch single quote
+- `useCreateQuote` - Create quote mutation
+- `useDeleteQuote` - Delete quote mutation
+- `useGeneratePdf` - Start PDF generation
+- `usePdfJobStatus` - Poll PDF job status
+
+#### `libs/rules` - Rules Engine
+- `rules.config.ts` - Configurable rules (tax rates, discounts)
+- `calculateTotals()` - Calculate subtotal, discount, tax, total
+
+#### `libs/utils` - Utilities
+- `formatCurrency()` - Format numbers as currency
+- `parseError()` - Safe error message extraction
+
+## 🔌 API Routes
+
+### Quotes
 
 ```
-PORT=3333
-NODE_ENV=development
+GET    /api/quotes              # List all quotes
+GET    /api/quotes/:id          # Get quote by ID
+POST   /api/quotes              # Create new quote
+PUT    /api/quotes/:id          # Update quote
+DELETE /api/quotes/:id          # Delete quote
 ```
 
-**PDF Service (`apps/pdf-service/.env`):**
+### PDF Jobs
 
 ```
-PORT=3334
-NODE_ENV=development
+GET    /api/pdf-jobs            # List all PDF jobs
+GET    /api/pdf-jobs/:id        # Get PDF job status
+POST   /api/pdf-jobs             # Create PDF job (returns 202 Accepted)
+GET    /api/pdf-jobs/quote/:id  # Get PDF jobs for a quote
 ```
 
-#### Notes
+## 💾 Database Schema
 
-- `.env` files are gitignored and should not be committed
-- `.env.example` files serve as templates and should be committed
-- You can override these values by setting environment variables in your shell or CI/CD pipeline
-- **Important**: For Vite (web app), environment variables must be prefixed with `VITE_` to be exposed to the client (e.g., `VITE_API_URL`)
+### Quote
+- `id` (cuid)
+- `customerName`, `customerEmail`
+- `customerType` (standard/premium)
+- `subtotal`, `discount`, `tax`, `total`
+- `notes`, `validUntil`
+- `createdAt`, `updatedAt`
 
-### Development
+### QuoteItem
+- `id`, `quoteId` (FK)
+- `description`, `quantity`, `unitPrice`
+
+### PdfJob
+- `id`, `quoteId` (FK)
+- `status` (pending/processing/completed/failed)
+- `pdfUrl`, `errorMessage`
+- `createdAt`, `completedAt`
+
+## 🎨 UI Components
+
+### Chakra UI Setup
+- Provider configured in `main.tsx`
+- Responsive design with breakpoints
+- Consistent spacing and typography
+- Toast notifications for user feedback
+
+### Pages
+
+**QuotesListPage:**
+- Table view of all quotes
+- Create new quote button
+- Delete with confirmation modal
+- Customer type badges
+
+**CreateQuotePage:**
+- Dynamic line items (add/remove)
+- Real-time totals preview
+- Customer type selection
+- Form validation with error messages
+
+**QuoteDetailPage:**
+- Full quote details
+- Line items table
+- Totals breakdown
+- PDF generation button
+- PDF status with polling
+- Download link when ready
+
+## 🔄 Data Flow
+
+### Creating a Quote
+1. User fills form → React Hook Form validation
+2. Submit → `useCreateQuote()` mutation
+3. API validates with Zod → Prisma saves to DB
+4. Rules engine calculates totals
+5. React Query invalidates cache → UI updates
+
+### Generating PDF
+1. User clicks "Generate PDF" → `useGeneratePdf()` mutation
+2. API creates `PdfJob` with status "pending"
+3. Returns 202 Accepted with `jobId`
+4. Frontend starts polling with `usePdfJobStatus()`
+5. PDF service processes job asynchronously
+6. Status updates: pending → processing → completed
+7. UI shows download link when ready
+
+## 🧪 Rules Engine
+
+### Configuration (`libs/rules/rules.config.ts`)
+
+```typescript
+{
+  taxRates: {
+    standard: 0.1,  // 10%
+    premium: 0.08,  // 8%
+  },
+  discountRules: {
+    premium: {
+      threshold: 100,    // $100
+      percentage: 0.1,   // 10% discount
+    },
+    standard: {
+      threshold: 500,    // $500
+      percentage: 0.05,  // 5% discount
+    },
+  },
+}
+```
+
+### Calculation Flow
+1. Calculate subtotal from line items
+2. Apply discount if threshold met (based on customer type)
+3. Calculate tax on discounted amount
+4. Calculate total
+5. Return breakdown with explanation
+
+## 🛠️ Development
+
+### Run Individual Services
 
 ```bash
-# Start all apps simultaneously (recommended)
-pnpm dev
-# This will start:
-# - Web app at http://localhost:4200
-# - API server at http://localhost:3333/api
-# - PDF service at http://localhost:3334/api
-
-# Or start individual apps:
-
-# Start the web app (React)
-npx nx dev web
-# Available at http://localhost:4200
-
-# Start the API server
-npx nx serve api
-# Available at http://localhost:3333/api
-
-# Start the PDF service
-npx nx serve pdf-service
-# Available at http://localhost:3334/api
-
-# Run all apps simultaneously (alternative)
-npx nx run-many -t serve --projects=web,api,pdf-service --parallel=3
-```
-
-## 📚 Available Commands
-
-### For the `web` Project (React App)
-
-#### Development
-
-```bash
-# Start dev server with hot reload
-npx nx dev web
+# Web app only
 npx nx serve web
 
-# Preview production build locally
-npx nx preview web
-
-# Serve static files
-npx nx serve-static web
-```
-
-#### Building
-
-```bash
-# Build for production
-npx nx build web
-
-# Build dependencies
-npx nx build-deps web
-
-# Watch dependencies
-npx nx watch-deps web
-```
-
-#### Testing
-
-```bash
-# Run tests
-npx nx test web
-
-# Run tests with UI
-npx nx test web --ui
-```
-
-#### Code Quality
-
-```bash
-# Lint code
-npx nx lint web
-
-# Fix linting issues automatically
-npx nx lint web --fix
-
-# Type check without building
-npx nx typecheck web
-```
-
-### For the `api` Project (Express API)
-
-#### Development
-
-```bash
-# Start API server with watch mode
+# API only
 npx nx serve api
 
-# Start with development configuration
-npx nx serve api --configuration=development
-
-# Start with production configuration
-npx nx serve api --configuration=production
-```
-
-#### Building
-
-```bash
-# Build for production
-npx nx build api
-```
-
-#### Code Quality
-
-```bash
-# Lint code
-npx nx lint api
-
-# Fix linting issues automatically
-npx nx lint api --fix
-```
-
-### For the `pdf-service` Project (PDF Service)
-
-#### Development
-
-```bash
-# Start PDF service with watch mode
+# PDF service only
 npx nx serve pdf-service
-
-# Start with development configuration
-npx nx serve pdf-service --configuration=development
-
-# Start with production configuration
-npx nx serve pdf-service --configuration=production
 ```
 
-#### Building
+### Database Commands
 
 ```bash
-# Build for production
-npx nx build pdf-service
+# Generate Prisma Client
+pnpm prisma generate
+
+# Create migration
+pnpm prisma migrate dev --name migration_name
+
+# Reset database (dev only)
+pnpm prisma migrate reset
 ```
 
-#### Code Quality
+### Code Quality
 
 ```bash
-# Lint code
-npx nx lint pdf-service
+# Lint all projects
+pnpm lint
 
-# Fix linting issues automatically
-npx nx lint pdf-service --fix
+# Format code
+pnpm format
+
+# Type check
+npx nx run-many -t typecheck --all
 ```
 
-### Run Tasks Across All Projects
+## 📝 Key Implementation Details
 
-```bash
-# Run lint on all projects
-npx nx run-many -t lint
+### React Query Best Practices
+- Stable query keys: `['quotes']`, `['quotes', id]`, `['pdfJobs', jobId]`
+- Cache invalidation on mutations
+- Polling for PDF job status (stops when completed)
+- Optimistic updates (optional enhancement)
 
-# Run build on all projects
-npx nx run-many -t build
+### Error Handling
+- Centralized error handler middleware
+- Consistent error response format
+- Toast notifications for user feedback
+- Safe error parsing utilities
 
-# Run only affected projects (requires git)
-npx nx affected -t build
+### Type Safety
+- Zod schemas shared across FE/BE
+- TypeScript strict mode
+- Prisma-generated types
+- React Hook Form type inference
 
-# Run tasks in parallel
-npx nx run-many -t build --parallel=3
-```
+## 🎯 Demo Flow
 
-### Useful Nx Commands
+1. **Create Quote**
+   - Navigate to "Create New Quote"
+   - Fill customer info, select type (standard/premium)
+   - Add line items dynamically
+   - See real-time totals preview
+   - Submit → navigates to detail page
 
-```bash
-# View project dependency graph
-npx nx graph
+2. **View Quote**
+   - See all quotes in table
+   - Click to view details
+   - See calculated totals with breakdown
 
-# Show project details and available targets
-npx nx show project web
+3. **Generate PDF**
+   - Click "Generate PDF" button
+   - Status shows: pending → processing → completed
+   - Download link appears when ready
 
-# Clear Nx cache
-npx nx reset
+4. **Delete Quote**
+   - Click delete → confirmation modal
+   - Confirm → quote removed, list updates
 
-# List installed plugins
-npx nx list
-```
+## 📚 Additional Resources
 
-## 🎯 Available Targets
+- [Nx Documentation](https://nx.dev)
+- [Chakra UI](https://chakra-ui.com)
+- [React Query](https://tanstack.com/query)
+- [Prisma](https://www.prisma.io/docs)
+- [Zod](https://zod.dev)
 
-The `web` project has the following targets (automatically inferred by Nx plugins):
+## 🚧 Future Enhancements
 
-| Target         | Description                          |
-| -------------- | ------------------------------------ |
-| `lint`         | Run ESLint to check code quality     |
-| `build`        | Build the application for production |
-| `serve`        | Start development server             |
-| `dev`          | Alias for serve (development mode)   |
-| `preview`      | Preview production build locally     |
-| `serve-static` | Serve static files                   |
-| `typecheck`    | Run TypeScript type checking         |
-| `test`         | Run tests with Vitest                |
-| `build-deps`   | Build project dependencies           |
-| `watch-deps`   | Watch project dependencies           |
+- [ ] Add authentication/authorization
+- [ ] Email quote to customer
+- [ ] Quote templates
+- [ ] Export to CSV/Excel
+- [ ] Advanced filtering and search
+- [ ] Quote versioning
+- [ ] Real-time collaboration
+- [ ] PDF customization options
 
-## 🏗️ Project Structure
+## 📄 License
 
-```
-rulequote/
-├── apps/               # Applications directory
-│   ├── web/            # React application (Vite)
-│   │   ├── src/        # Source code
-│   │   ├── public/     # Static assets
-│   │   ├── .env        # Environment variables (gitignored)
-│   │   ├── project.json # Project configuration
-│   │   └── vite.config.mts # Vite configuration
-│   ├── api/            # Express API server (Webpack)
-│   │   ├── src/        # Source code
-│   │   ├── .env        # Environment variables (gitignored)
-│   │   ├── project.json # Project configuration
-│   │   └── webpack.config.js # Webpack configuration
-│   └── pdf-service/    # PDF service (Webpack)
-│       ├── src/        # Source code
-│       ├── .env        # Environment variables (gitignored)
-│       ├── project.json # Project configuration
-│       └── webpack.config.js # Webpack configuration
-├── nx.json             # Nx workspace configuration
-├── package.json        # Root dependencies
-├── pnpm-workspace.yaml # pnpm workspace config
-├── tsconfig.base.json  # Shared TypeScript config
-└── setup-env.sh        # Environment setup script
-```
-
-## ⚙️ Configuration Details
-
-### Nx Configuration (`nx.json`)
-
-- **Plugins**:
-  - `@nx/eslint/plugin` - Auto-creates lint targets
-  - `@nx/vite/plugin` - Auto-creates Vite targets (build, serve, test, etc.)
-  - `@nx/webpack/plugin` - Auto-creates Webpack targets (build, serve, etc.)
-- **Named Inputs**: Defines cache invalidation rules for optimized builds
-- **Generators**: Default options for React apps (CSS styling, ESLint, Vite bundler)
-
-### Package Manager (`pnpm-workspace.yaml`)
-
-- Uses pnpm workspaces for dependency management
-- Auto-installs peer dependencies
-
-### TypeScript (`tsconfig.base.json`)
-
-- Shared TypeScript configuration for all projects
-- Path aliases can be configured here for project imports
-
-### Vite Configuration (`apps/web/vite.config.mts`)
-
-- Development server: Configurable via `PORT` env variable (default: `4200`)
-- Host: Configurable via `HOST` env variable (default: `localhost`)
-- Build output: `dist/web`
-- Configured with React plugin and Nx TypeScript path support
-- Reads environment variables from `apps/web/.env`
-
-### Webpack Configuration (`apps/api/webpack.config.js` & `apps/pdf-service/webpack.config.js`)
-
-- Node.js target applications
-- Build output: `dist/api` and `dist/pdf-service`
-- Configured with Nx Webpack plugin
-- Reads environment variables via `dotenv` package
-
-## ➕ Adding New Projects
-
-### Add a New React Application
-
-```bash
-npx nx g @nx/react:app my-app
-```
-
-### Add a New React Library
-
-```bash
-npx nx g @nx/react:lib my-lib
-```
-
-### Add a New Plugin
-
-```bash
-# Example: Add Node.js support
-npx nx add @nx/node
-
-# Example: Add Next.js support
-npx nx add @nx/next
-```
-
-### List Available Generators
-
-```bash
-# List all installed plugins
-npx nx list
-
-# Get details about a specific plugin
-npx nx list @nx/react
-```
-
-## ✨ Key Features
-
-- **Task Inference**: Nx plugins automatically detect and create targets from configuration files
-- **Smart Caching**: Nx caches task results for faster builds (connected to Nx Cloud)
-- **Parallel Execution**: Run multiple tasks in parallel for better performance
-- **Affected Detection**: Only run tasks for projects that have changed
-- **TypeScript Path Mapping**: Ready for path aliases configuration
-- **Environment Variables**: All apps use `.env` files for configuration (ports, etc.)
-- **Port Management**: Each app has its own configurable port to avoid conflicts
-
-## 🔗 Remote Caching Setup
-
-This workspace is connected to Nx Cloud for remote caching.
-
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/Lxru9eftmv)
-
-## 🛠️ Development Tools
-
-### Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## 📖 Learn More
-
-### Nx Resources
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Running tasks in Nx](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Inferred tasks](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Community
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+MIT

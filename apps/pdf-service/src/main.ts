@@ -19,6 +19,10 @@ app.use(express.urlencoded({ extended: true }));
 // Static assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
+// Serve PDF files
+const pdfOutputDir = process.env.PDF_OUTPUT_DIR || path.join(process.cwd(), 'tmp', 'pdfs');
+app.use('/pdfs', express.static(pdfOutputDir));
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

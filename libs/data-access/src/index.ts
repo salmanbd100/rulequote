@@ -3,3 +3,4 @@ export * from './lib/apiClient';
 export * from './lib/queryKeys';
 export * from './lib/hooks/useQuotes';
 export * from './lib/hooks/useGeneratePdf';
+export * from './lib/hooks/usePdfJobStatus';

@@ -6,6 +6,7 @@ import { z } from 'zod';
 export const createQuoteSchema = z.object({
   customerName: z.string().min(1, 'Customer name is required'),
   customerEmail: z.string().email('Invalid email address'),
+  customerType: z.enum(['standard', 'premium']).optional().default('standard'),
   items: z
     .array(
       z.object({

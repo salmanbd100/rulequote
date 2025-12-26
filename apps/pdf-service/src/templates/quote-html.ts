@@ -1,16 +1,43 @@
 import { CreateQuoteInput } from '@rulequote/schemas';
+import { calculateTotals } from '@rulequote/rules';
+
+export interface QuoteForPdf extends CreateQuoteInput {
+  id: string;
+  customerType?: 'standard' | 'premium';
+  subtotal?: number;
+  discount?: number;
+  tax?: number;
+  total?: number;
+  createdAt?: Date | string;
+}
 
 /**
  * Generate HTML template for a quote
  */
-export function generateQuoteHtml(quote: CreateQuoteInput & { id: string }): string {
+export function generateQuoteHtml(quote: QuoteForPdf): string {
   const items = quote.items || [];
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.quantity * item.unitPrice,
-    0
-  );
-  const tax = subtotal * 0.1; // 10% tax (placeholder)
-  const total = subtotal + tax;
+
+  // Use provided totals or calculate them
+  let totals;
+  if (quote.subtotal !== undefined && quote.tax !== undefined && quote.total !== undefined) {
+    totals = {
+      subtotal: quote.subtotal,
+      discount: quote.discount || 0,
+      tax: quote.tax,
+      total: quote.total,
+    };
+  } else {
+    const calculated = calculateTotals({
+      items,
+      customerType: quote.customerType || 'standard',
+    });
+    totals = {
+      subtotal: calculated.subtotal,
+      discount: calculated.discount,
+      tax: calculated.tax,
+      total: calculated.total,
+    };
+  }
 
   return `
 <!DOCTYPE html>
@@ -60,7 +87,8 @@ export function generateQuoteHtml(quote: CreateQuoteInput & { id: string }): str
 <body>
   <div class="header">
     <h1>Quote #${quote.id}</h1>
-    <p>Date: ${new Date().toLocaleDateString()}</p>
+    <p>Date: ${quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}</p>
+    ${quote.customerType === 'premium' ? '<p><strong>Premium Customer</strong></p>' : ''}
   </div>
 
   <div class="customer-info">
@@ -95,9 +123,10 @@ export function generateQuoteHtml(quote: CreateQuoteInput & { id: string }): str
   </table>
 
   <div class="totals">
-    <p>Subtotal: $${subtotal.toFixed(2)}</p>
-    <p>Tax: $${tax.toFixed(2)}</p>
-    <p class="total-row">Total: $${total.toFixed(2)}</p>
+    <p>Subtotal: $${totals.subtotal.toFixed(2)}</p>
+    ${totals.discount > 0 ? `<p>Discount: -$${totals.discount.toFixed(2)}</p>` : ''}
+    <p>Tax: $${totals.tax.toFixed(2)}</p>
+    <p class="total-row">Total: $${totals.total.toFixed(2)}</p>
   </div>
 
   ${quote.notes ? `<div><h3>Notes</h3><p>${quote.notes}</p></div>` : ''}

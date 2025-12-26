@@ -51,3 +51,20 @@ export function useCreateQuote() {
     },
   });
 }
+
+/**
+ * Hook to delete a quote
+ */
+export function useDeleteQuote() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiClient.delete(`/quotes/${id}`);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.quotes.lists() });
+    },
+  });
+}

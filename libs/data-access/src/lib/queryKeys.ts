@@ -17,3 +17,5 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.pdfJobs.details(), id] as const,
   },
 };
+
+
